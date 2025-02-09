@@ -1,0 +1,10 @@
+/.phpunit.cache
+/storage/mysql-data
+/storage/nginx-logs
+/storage/redis-data
+/vendor
+.env
+.phpunit.result.cache
+/.fleet
+/.idea
+/.vscode

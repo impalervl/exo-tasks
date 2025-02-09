@@ -1,0 +1,51 @@
+services:
+  php-fpm:
+    image: php-fpm
+    container_name: exo-tasks-fpm
+    build:
+      context: .
+      dockerfile: ./infrastructure/docker/phpfpm.Dockerfile
+    volumes:
+      - ./:/var/www/html:cached
+    depends_on:
+      - redis
+      - mysql
+    links:
+      - mysql
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  webserver:
+    image: nginx:latest
+    container_name: exo-tasks-nginx
+    links:
+      - php-fpm
+    depends_on:
+      - php-fpm
+    volumes:
+      - ./:/var/www/html
+      - ./storage/nginx-logs:/var/log/nginx
+      - ./infrastructure/docker/nginx/conf.d:/etc/nginx/conf.d
+    ports:
+      - "${APP_PORT}:80"
+  mysql:
+    image: mysql:8.0
+    container_name: exo-tasks-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TEST_DB: ${DB_DATABASE_TEST}
+      TEST_USER: ${DB_USERNAME_TEST}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - ./storage/mysql-data:/var/lib/mysql:cached
+      - ./infrastructure/docker/mysql:/docker-entrypoint-initdb.d
+  redis:
+    image: redis
+    container_name: exo-tasks-redis
+    volumes:
+      - ./storage/redis-data:/data
+    ports:
+      - "6379:6379"
