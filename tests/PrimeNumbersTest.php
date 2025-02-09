@@ -10,7 +10,7 @@ class PrimeNumbersTest extends TestCase
 {
     public function testPrimeNumbers(): void
     {
-        $response = $this->get('/prime-number');
+        $response = $this->get('/prime-numbers');
         $result   = json_decode($response->getContent(), true);
 
         foreach ($result as $entry) {
